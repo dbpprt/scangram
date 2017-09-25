@@ -1,1 +1,28 @@
-﻿
+﻿#scanagram-content .scanagram-maincontent {
+    background-color: #fff;
+    opacity: 0.8;
+}
+
+body, #scanagram-content {
+    background-color: #1f1e1e !important
+}
+
+    #scanagram-content .scanagram-image {
+        width: 100%;
+        height: auto;
+        margin: 20px 0;
+        position:relative;
+    }
+
+    #scanagram-content .scanagram-cropperpoint {
+        background-color: #e16710;
+        height: 20px;
+        width: 20px;
+        border-radius:50%;
+        opacity: 0.8;
+        position:absolute;
+    }
+
+    #scanagram-content .scanagram-button.btn.btn-primary {
+        border-radius: 0;
+    }

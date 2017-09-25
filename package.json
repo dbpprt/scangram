@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/dennisbappert/scangram/issues"
   },
-  "homepage": "https://github.com/dennisbappert/scangram#readme"
+  "homepage": "https://github.com/dennisbappert/scangram#readme",
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "interactjs": "^1.2.9",
+    "jquery": "^3.2.1"
+  }
 }

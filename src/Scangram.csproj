@@ -5,7 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="11.0.0" />
+    <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="7.0.7.300" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
+    <PackageReference Include="OpenCvSharp3-AnyCPU" Version="3.2.0.20170911" />
+    <PackageReference Include="Telegram.Bot" Version="13.2.2-rc" />
   </ItemGroup>
 
   <ItemGroup>
@@ -13,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Models\" />
     <Folder Include="wwwroot\images\" />
     <Folder Include="wwwroot\lib\" />
   </ItemGroup>

@@ -39,7 +39,7 @@ namespace Scangram
             services.AddSingleton(new ImageDocumentDetectionService(
                 new IImagePreProcessor[] { new ResizeImagePreProcessor(1600), new SimpleCannyImagePreProcessor() },
                 new SimplePerspectiveTransformImageExtractor(),
-                new IContourDetector[] { new SimpleContourDetector(), new ConvexHullContourDetector() },
+                new IContourDetector[] { new SimpleContourDetector(20, 0.005), new SimpleContourDetector(15, 0.03), new ConvexHullContourDetector(10, 0.03) },
                 new IResultScorer[] { new FourEdgesScorer(), new ConvexityScorer(), new AreaScorer(10), new HoughLinesScorer() },
                 new IImagePostProcessor[] { }));
 

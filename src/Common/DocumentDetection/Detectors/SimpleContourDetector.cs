@@ -5,9 +5,12 @@ namespace Scangram.Common.DocumentDetection.Detectors
 {
     class SimpleContourDetector : BaseDetector
     {
-        public SimpleContourDetector() 
-            : base(15)
+        private readonly double _epsilon;
+
+        public SimpleContourDetector(int score, double epsilon) 
+            : base(score)
         {
+            _epsilon = epsilon;
         }
 
         public override IEnumerable<ContourResult> DetectDocumentContours(Mat image, Mat sourceImage)
@@ -20,7 +23,7 @@ namespace Scangram.Common.DocumentDetection.Detectors
             foreach (var contour in contours)
             {
                 var peri = Cv2.ArcLength(contour, true);
-                var simplifiedContour = Cv2.ApproxPolyDP(contour, 0.03 * peri, true);
+                var simplifiedContour = Cv2.ApproxPolyDP(contour, _epsilon * peri, true);
 
                 if (simplifiedContour != null)
                 {

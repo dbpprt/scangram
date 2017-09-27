@@ -5,9 +5,12 @@ namespace Scangram.Common.DocumentDetection.Detectors
 {
     class ConvexHullContourDetector : BaseDetector
     {
-        public ConvexHullContourDetector() 
-            : base(10)
+        private readonly double _epsilon;
+
+        public ConvexHullContourDetector(int score, double epsilon) 
+            : base(score)
         {
+            _epsilon = epsilon;
         }
 
         public override IEnumerable<ContourResult> DetectDocumentContours(Mat image, Mat sourceImage)
@@ -21,7 +24,7 @@ namespace Scangram.Common.DocumentDetection.Detectors
             {
                 var convexHull = Cv2.ConvexHull(contour);
                 var peri = Cv2.ArcLength(convexHull, true);
-                var simplifiedContour = Cv2.ApproxPolyDP(convexHull, 0.03 * peri, true);
+                var simplifiedContour = Cv2.ApproxPolyDP(convexHull, _epsilon * peri, true);
 
                 if (simplifiedContour != null)
                 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -55,44 +56,91 @@ namespace Scangram.Services
 
         private async Task ProcessItem(WorkItem workItem)
         {
-            using (var memoryStream = new MemoryStream())
+            var files = new List<Stream>();
+
+            try
             {
-                var file = await _telegramBotClient.GetFileAsync(workItem.Files.First(), memoryStream);
-                _logger.LogInformation("Downloaded file with name {0} and id {1} - Size: {2} KB", file.FilePath, file.FileId, file.FileSize / 1024);
-
-                var result = _imageDocumentDetectionService.ProcessStream(memoryStream);
-
-                if (result == null)
+                foreach (var fileInfo in workItem.Files)
                 {
-                    await _telegramBotClient.SendTextMessageAsync(workItem.ChatId, "Oh snap, I'm not able to handle this picture :(");
-                    return;
-                }
+                    var stream = new MemoryStream();
 
-                using (result)
-                {
-                    // TODO: Reply to initial message!
-                    // TODO: File name
-
-                    switch (workItem.ConversationType)
+                    try
                     {
-                        case ConversationType.Image:
-                            await _telegramBotClient.SendPhotoAsync(workItem.ChatId, new FileToSend(Guid.NewGuid() + ".jpg", result));
-                            break;
+                        var file = await _telegramBotClient.GetFileAsync(fileInfo, stream);
+                        _logger.LogInformation("Downloaded file with name {0} and id {1} - Size: {2} KB", file.FilePath,
+                            file.FileId, file.FileSize / 1024);
 
-                        case ConversationType.Pdf:
-                            using (var image = new MagickImage(result, new MagickReadSettings(new JpegReadDefines())))
+                        if (workItem.DocumentAction == DocumentAction.DocumentScan)
+                        {
+                            var result = _imageDocumentDetectionService.ProcessStream(stream);
+                            stream.Dispose();
+
+                            if (result == null)
                             {
-                                using (var pdfStream = new MemoryStream())
-                                {
-                                    image.Write(pdfStream, MagickFormat.Pdf);
-                                    pdfStream.Position = 0;
-
-                                    await _telegramBotClient.SendDocumentAsync(workItem.ChatId, new FileToSend(Guid.NewGuid() + ".pdf", pdfStream));
-                                }
+                                await _telegramBotClient.SendTextMessageAsync(workItem.ChatId,
+                                    "Oh snap, I'm not able to handle this picture :(");
+                                return;
                             }
-                            break;
+
+                            files.Add(result);
+                        }
+                        else
+                        {
+                            files.Add(stream);
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogCritical(ex, "Unable to process a file :(");
+                        stream.Dispose();
+
+                        await _telegramBotClient.SendTextMessageAsync(workItem.ChatId,
+                            "Oh snap, I'm not able to complete your action :(");
+                        return;
                     }
                 }
+
+                switch (workItem.ConversationType)
+                {
+                    case ConversationType.Image:
+                        foreach (var processedFile in files)
+                        {
+                            await _telegramBotClient.SendPhotoAsync(workItem.ChatId,
+                                new FileToSend(Guid.NewGuid() + ".jpg", processedFile));
+                        }
+                        break;
+
+                    case ConversationType.Pdf:
+                        using (var collection = new MagickImageCollection())
+                        {
+                            foreach (var processedFile in files)
+                            {
+                                collection.Add(new MagickImage(processedFile));
+                            }
+
+                            using (var pdfStream = new MemoryStream())
+                            {
+                                collection.Write(pdfStream, MagickFormat.Pdf);
+                                pdfStream.Position = 0;
+
+                                await _telegramBotClient.SendDocumentAsync(workItem.ChatId, new FileToSend(Guid.NewGuid() + ".pdf", pdfStream));
+                            }
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex, "Unable to process a file :(");
+
+                await _telegramBotClient.SendTextMessageAsync(workItem.ChatId,
+                    "Oh snap, I'm not able to complete your action :(");
+                return;
+            }
+            finally
+            {
+
             }
         }
 

@@ -28,6 +28,8 @@ namespace Scangram.Services
         private readonly ILogger<ConversationStateMachine> _logger;
         private readonly ChatId _chatId;
 
+        public bool InProgress = true;
+
         private State _state = State.None;
         private DocumentAction _documentAction = DocumentAction.NotSet;
         private ConversationType _conversationType = ConversationType.NotSet;
@@ -84,12 +86,16 @@ namespace Scangram.Services
 
                 if (message.Type == MessageType.DocumentMessage || message.Type == MessageType.PhotoMessage)
                 {
+                    await HandleFile(message);
+
                     if (_documentAction == DocumentAction.NotSet)
                     {
                         await AskForDocumentActionAsync(message);
                     }
-
-                    await HandleFile(message);
+                    else
+                    {
+                        await AskForAnotherFileAsync(message);
+                    }
                 }
                 else
                 {
@@ -112,6 +118,7 @@ namespace Scangram.Services
             await _telegramBotClient.SendTextMessageAsync(_chatId, "Okay no problem.",
                 replyToMessageId: query.Message.MessageId);
 
+            await AskForConversationTypeAsync(query.Message);
         }
 
         private async Task HandleConversationTypeAsync(CallbackQuery query, ConversationType conversationType)
@@ -121,6 +128,32 @@ namespace Scangram.Services
             await _telegramBotClient.SendTextMessageAsync(_chatId, "Okay no problem.",
                 replyToMessageId: query.Message.MessageId);
 
+            await AskForAnotherFileAsync(query.Message);
+        }
+
+        private async Task HandleAnotherFileAsync(CallbackQuery query, AddFileAction addFileAction)
+        {
+            await _telegramBotClient.AnswerCallbackQueryAsync(query.Id);
+
+            if (addFileAction == AddFileAction.Yes)
+            {
+                await _telegramBotClient.SendTextMessageAsync(_chatId, "Just send me the next file!",
+                    replyToMessageId: query.Message.MessageId);
+            }
+            else
+            {
+                _workerService.QueueItem(new WorkItem
+                {
+                    ChatId = _chatId.Identifier,
+                    ConversationType = _conversationType,
+                    DocumentAction = _documentAction,
+                    Files = _files
+                });
+
+                await _telegramBotClient.SendTextMessageAsync(_chatId, "Please be patient, your conversation is in progress. You can start over again, I'll ping you as soon as I'm done.",
+                    replyToMessageId: query.Message.MessageId);
+                InProgress = false;
+            }
         }
 
         private async Task AskForDocumentActionAsync(Message message)
@@ -141,6 +174,27 @@ namespace Scangram.Services
             });
 
             await _telegramBotClient.SendTextMessageAsync(message.Chat.Id, "How should I handle your file? 'As it is' will not modify your image and 'With document detection' tries to extract a document from your image.",
+                replyMarkup: keyboard, replyToMessageId: message.MessageId);
+        }
+
+        private async Task AskForAnotherFileAsync(Message message)
+        {
+            var keyboard = new InlineKeyboardMarkup(new InlineKeyboardButton[][]
+            {
+                new[]
+                {
+                    new InlineKeyboardCallbackButton("Yes", CreateCallbackQueryData(async query =>
+                    {
+                        await HandleAnotherFileAsync(query, AddFileAction.Yes);
+                    })),
+                    new InlineKeyboardCallbackButton("No, I'm done.", CreateCallbackQueryData(async query =>
+                    {
+                        await HandleAnotherFileAsync(query, AddFileAction.No);
+                    }))
+                },
+            });
+
+            await _telegramBotClient.SendTextMessageAsync(message.Chat.Id, "Do you want to add another file?",
                 replyMarkup: keyboard, replyToMessageId: message.MessageId);
         }
 
@@ -226,26 +280,8 @@ namespace Scangram.Services
                 }
 
                 _logger.LogInformation("Received file from {0} with id {1}", message.From.Id, file.FileId);
-
                 
-
-                var cacheEntry = await _cache.GetOrCreateAsync(args.Message.Chat.Id, entry =>
-                {
-                    entry.SlidingExpiration = new TimeSpan(0, 15, 0);
-
-                    return Task.FromResult(new ChatState
-                    {
-                        MessageId = args.Message.MessageId,
-                        Files = new List<string>
-                        {
-                            file.FileId
-                        }
-                    });
-                });
-
-                // TODO: In case the cacheEntry references the same object this access needs to be synchronized!
-                cacheEntry.Files.Add(file.FileId);
-                _cache.Set(args.Message.Chat.Id, cacheEntry, new TimeSpan(0, 15, 0));
+                _files.Add(file.FileId);
             }
         }
     }

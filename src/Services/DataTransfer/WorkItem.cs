@@ -12,5 +12,7 @@ namespace Scangram.Services.DataTransfer
         public long ChatId { get; set; }
 
         public ConversationType ConversationType { get; set; }
+
+        public DocumentAction DocumentAction { get; set; }
     }
 }

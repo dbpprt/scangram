@@ -4,7 +4,7 @@ using Scangram.Common.DocumentDetection.Contracts;
 
 namespace Scangram.Common.DocumentDetection.Scorer
 {
-    class ConvexityScorer : IResultScorer
+    public class ConvexityScorer : IResultScorer
     {
         public void Score(IList<ContourResult> results, Mat preProcessedImage, Mat sourceImage)
         {

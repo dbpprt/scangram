@@ -6,11 +6,11 @@ using Scangram.Common.DocumentDetection.Contracts;
 
 namespace Scangram.Common.DocumentDetection.Scorer
 {
-    class HoughLinesScorer : IResultScorer
+    public class HoughLinesScorer : IResultScorer
     {
         public void Score(IList<ContourResult> results, Mat preProcessedImage, Mat sourceImage)
         {
-            var lines = Cv2.HoughLinesP(preProcessedImage, 0.02, Math.PI / 500, 10, 100, 100);
+            var lines = preProcessedImage.HoughLinesP(0.02, Math.PI / 500, 10, 100, 100);
             var scoringResults = new List<(double, ContourResult)>();
 
             for (var i = results.Count - 1; i >= 0; i--)

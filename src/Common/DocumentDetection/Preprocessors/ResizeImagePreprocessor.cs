@@ -5,7 +5,7 @@ using Scangram.Common.DocumentDetection.Contracts;
 
 namespace Scangram.Common.DocumentDetection.Preprocessors
 {
-    class ResizeImagePreProcessor : IImagePreProcessor
+    public class ResizeImagePreProcessor : IImagePreProcessor
     {
         private readonly int _height;
 

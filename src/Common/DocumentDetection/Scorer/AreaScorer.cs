@@ -4,7 +4,7 @@ using Scangram.Common.DocumentDetection.Contracts;
 
 namespace Scangram.Common.DocumentDetection.Scorer
 {
-    class AreaScorer : IResultScorer
+    public class AreaScorer : IResultScorer
     {
         private readonly int _maxSizeTolerancePixels;
 

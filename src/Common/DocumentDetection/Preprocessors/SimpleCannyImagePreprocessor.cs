@@ -4,7 +4,7 @@ using Scangram.Common.DocumentDetection.Contracts;
 
 namespace Scangram.Common.DocumentDetection.Preprocessors
 {
-    class SimpleCannyImagePreProcessor : IImagePreProcessor
+    public class SimpleCannyImagePreProcessor : IImagePreProcessor
     {
         public dynamic PreProcessImage(ref Mat image, Mat sourceImage)
         {
@@ -17,9 +17,11 @@ namespace Scangram.Common.DocumentDetection.Preprocessors
                 Cv2.MedianBlur(copy, copy, 11);
                 Cv2.CopyMakeBorder(copy, copy, 5, 5, 5, 5, BorderTypes.Constant, Scalar.Black);
 
-                // TODO: Dispose new Mat()
-                var otsu = Cv2.Threshold(copy, new Mat(), 0, 255, ThresholdTypes.Binary | ThresholdTypes.Otsu);
-                Cv2.Canny(copy, copy, otsu, otsu * 2, 3, true);
+                using (var tmp = new Mat())
+                {
+                    var otsu = Cv2.Threshold(copy, tmp, 0, 255, ThresholdTypes.Binary | ThresholdTypes.Otsu);
+                    Cv2.Canny(copy, copy, otsu, otsu * 2, 3, true);
+                }
             }
             catch
             {

@@ -5,7 +5,7 @@ using Scangram.Common.DocumentDetection.Contracts;
 
 namespace Scangram.Common.DocumentDetection
 {
-    class SimplePerspectiveTransformImageExtractor : IImageExtractor
+    public class SimplePerspectiveTransformImageExtractor : IImageExtractor
     {
         private static IEnumerable<Point2f> CornerSort(Point[] points)
         {

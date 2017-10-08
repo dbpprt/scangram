@@ -4,7 +4,7 @@ using Scangram.Common.DocumentDetection.Contracts;
 
 namespace Scangram.Common.DocumentDetection.Scorer
 {
-    class FourEdgesScorer : IResultScorer
+    public class FourEdgesScorer : IResultScorer
     {
         public void Score(IList<ContourResult> results, Mat preProcessedImage, Mat sourceImage)
         {

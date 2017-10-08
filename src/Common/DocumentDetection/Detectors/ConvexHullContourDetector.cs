@@ -3,7 +3,7 @@ using OpenCvSharp;
 
 namespace Scangram.Common.DocumentDetection.Detectors
 {
-    class ConvexHullContourDetector : BaseDetector
+    public class ConvexHullContourDetector : BaseDetector
     {
         private readonly double _epsilon;
 

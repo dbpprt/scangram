@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ImageMagick;
 using OpenCvSharp;
 using Scangram.Common.DocumentDetection.Contracts;
 
@@ -45,7 +46,7 @@ namespace Scangram.Common.DocumentDetection
                     {
                         contourResults.AddRange(boundaryDetector.DetectDocumentContours(preProcessedImage, image));
                     }
-                    
+
                     for (var i = 0; i < _preProcessors.Length; i++)
                     {
                         foreach (var contourResult in contourResults)
@@ -96,6 +97,16 @@ namespace Scangram.Common.DocumentDetection
 
         public Stream ProcessStream(Stream stream)
         {
+            //using (var image = new MagickImage(stream, new MagickReadSettings(new JpegReadDefines())))
+            //{
+            //    var size = new MagickGeometry(2000, 2000) { IgnoreAspectRatio = false };
+
+            //    image.Resize(size);
+            //    image.Format = MagickFormat.Jpeg;
+
+            //    image.Write(resizedStream);
+            //}
+
             using (var image = Mat.FromStream(stream, ImreadModes.Color))
             {
                 var preProcessedImage = image.Clone().CvtColor(ColorConversionCodes.BGR2GRAY);

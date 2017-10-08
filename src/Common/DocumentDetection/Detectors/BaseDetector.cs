@@ -4,7 +4,7 @@ using Scangram.Common.DocumentDetection.Contracts;
 
 namespace Scangram.Common.DocumentDetection.Detectors
 {
-    abstract class BaseDetector : IContourDetector
+    public abstract class BaseDetector : IContourDetector
     {
         public int Score { get; }
 

@@ -3,12 +3,12 @@ Description=Scangram telegram bot
 
 [Service]
 WorkingDirectory=/var/scangram
-ExecStart=/usr/bin/dotnet /var/scangram/scangram.dll
+ExecStart=/usr/bin/dotnet /var/scangram/Scangram.dll
 Restart=always
 RestartSec=10  # Restart service after 10 seconds if dotnet service crashes
 SyslogIdentifier=scangram
 User=scangram
-Environment=ASPNETCORE_ENVIRONMENT=Production 
+Environment=ASPNETCORE_ENVIRONMENT=Production
 
 [Install]
 WantedBy=multi-user.target

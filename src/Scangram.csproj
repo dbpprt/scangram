@@ -26,15 +26,27 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\scripts\installation\01_opencv.sh" Link="scripts\installation\01_opencv.sh" />
-    <Content Include="..\scripts\installation\02_imagemagick.sh" Link="scripts\installation\02_imagemagick.sh" />
-    <Content Include="..\scripts\installation\03_netcore2.sh" Link="scripts\installation\03_netcore2.sh" />
-    <Content Include="..\scripts\installation\04_opencvsharp.sh" Link="scripts\installation\04_opencvsharp.sh" />
-    <Content Include="..\scripts\scangram.service" Link="scripts\scangram.service" />
+    <Content Include="..\scripts\installation\01_opencv.sh" Link="scripts\installation\01_opencv.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\scripts\installation\02_imagemagick.sh" Link="scripts\installation\02_imagemagick.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\scripts\installation\03_netcore2.sh" Link="scripts\installation\03_netcore2.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\scripts\installation\04_opencvsharp.sh" Link="scripts\installation\04_opencvsharp.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\scripts\scangram.service" Link="scripts\scangram.service">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\scripts\stop-and-backup.sh" Link="scripts\stop-and-backup.sh" />
+    <Content Include="..\scripts\stop-and-backup.sh" Link="scripts\stop-and-backup.sh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
